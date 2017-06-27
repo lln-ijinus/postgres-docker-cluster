@@ -42,6 +42,12 @@ for NODE in "${NODES[@]}"; do
     NO_ROUTE=false
     echo ">>> Checking node $NODE"
 
+		# allow giving port 
+		PORT=5432
+		if [[ "$NODE" == *":"* ]];then 
+			PORT=${NODE##*:}
+			NODE=${NODE%:*}
+		fi
     MASTER=`PGCONNECT_TIMEOUT=$CHECK_PGCONNECT_TIMEOUT PGPASSWORD=$REPLICATION_PASSWORD psql -h $NODE -U $REPLICATION_USER $REPLICATION_DB  -tAc "SELECT upstream_node_name FROM repmgr_$CLUSTER_NAME.repl_show_nodes WHERE  cluster='$CLUSTER_NAME' AND conninfo LIKE '%host=$NODE%' AND (upstream_node_name IS NOT NULL AND upstream_node_name <>'') AND active=true"`
     if [[ "$?" -ne "0" ]]; then
         FAILED_NODES=$((FAILED_NODES + 1))

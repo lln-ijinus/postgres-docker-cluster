@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+
 /usr/local/bin/cluster/postgres/primary/configure.sh
 
 echo ">>> Creating replication user '$REPLICATION_USER'"

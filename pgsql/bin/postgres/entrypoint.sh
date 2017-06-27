@@ -28,7 +28,10 @@ fi
 if [ `ls $PGDATA/ | wc -l` != "0" ]; then
     echo ">>> Data folder is not empty $PGDATA:"
     ls -al $PGDATA
-
+		if [[ "$NEVER_CLEAN" == "1" ]]; then
+			echo ">>> Do not Clean data folder... but not master... exiting"
+			exit 1
+		fi
     if [[ "$FORCE_CLEAN" == "1" ]] || ! has_pg_cluster; then
         echo ">>> Cleaning data folder..."
         rm -rf $PGDATA/*
