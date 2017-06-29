@@ -8,5 +8,5 @@ done
 
 echo '>>> STARTING POSTGRES...'
 /usr/local/bin/cluster/postgres/entrypoint.sh & wait ${!} || echo ">>> Foreground processes returned code: '$?'"
-
+[[ "$TEST" == 1 ]] && sleep 86400
 system_exit

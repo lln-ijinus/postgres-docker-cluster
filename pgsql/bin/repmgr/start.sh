@@ -2,16 +2,17 @@
 set -e
 
 echo ">>> Waiting $REPMGR_WAIT_POSTGRES_START_TIMEOUT seconds for postgres on this node to start repmgr..."
-if [[ "$CURRENT_REPLICATION_PRIMARY_HOST" == "" && "$UPDATE_EXISTING_DB" == "1" ]]; then
+if [[ "$CURRENT_REPLICATION_PRIMARY_HOST" == "" ]] && [[ "$UPDATE_EXISTING_DB" == "1" ]]; then
+	set +e
 	wait_db $CLUSTER_NODE_NETWORK_NAME $REPLICATION_PRIMARY_PORT $POSTGRES_USER $POSTGRES_PASSWORD $POSTGRES_DB $REPMGR_WAIT_POSTGRES_START_TIMEOUT
 	DB_EXISTS=`PGPASSWORD=$REPLICATION_PASSWORD psql --username "$REPLICATION_USER" -h $CLUSTER_NODE_NETWORK_NAME -p $REPLICATION_PRIMARY_PORT -tAc "SELECT 1 FROM pg_database WHERE datname='$REPLICATION_DB'" template1`
 	if [[ "$DB_EXISTS" != "1" ]]; then
 		echo ">>> No replication database : creating it"
-		/usr/local/bin/cluster/postgres/primary/entrypoint.sh
+		gosu postgres /usr/local/bin/cluster/postgres/primary/entrypoint.sh
 		gosu postgres pg_ctl -D "$PGDATA" -m fast -w stop
 		gosu postgres /docker-entrypoint.sh postgres &
 	fi
-	
+	set -e
 else
 	wait_db $CLUSTER_NODE_NETWORK_NAME $REPLICATION_PRIMARY_PORT $REPLICATION_USER $REPLICATION_PASSWORD $REPLICATION_DB $REPMGR_WAIT_POSTGRES_START_TIMEOUT
 fi

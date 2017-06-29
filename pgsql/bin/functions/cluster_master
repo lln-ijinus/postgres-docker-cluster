@@ -28,7 +28,7 @@ if [ "$PARTNER_NODES" != "" ]; then
                 PRETENDING_MASTER=""
                 break
             fi
-            PRETENDING_MASTER="$NODE"
+            PRETENDING_MASTER="$NODE:$PORT"
         fi
 
     done

@@ -28,7 +28,7 @@ fi
 if [ `ls $PGDATA/ | wc -l` != "0" ]; then
     echo ">>> Data folder is not empty $PGDATA:"
     ls -al $PGDATA
-		if [[ "$NEVER_CLEAN" == "1" ]]; then
+		if [[ "$NEVER_CLEAN" == "1" ]] && ! has_pg_cluster; then
 			echo ">>> Do not Clean data folder... but not master... exiting"
 			exit 1
 		fi
@@ -49,4 +49,5 @@ else
     /usr/local/bin/cluster/postgres/standby/entrypoint.sh &
 fi
 
+echo ">>> Start repmgr..."
 /usr/local/bin/cluster/repmgr/start.sh
