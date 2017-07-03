@@ -26,6 +26,10 @@ master_response_timeout=$MASTER_RESPONSE_TIMEOUT
 loglevel=$LOG_LEVEL
 priority=$NODE_PRIORITY
 " >> $REPMGR_CONFIG_FILE
+if [[ "$BARMAN_SERVER" != "" ]] && [[ -e "$BARMAN_SSH_PRIV_PATH" ]]; then
+	echo "barman_server=$BARMAN_SERVER" >> $REPMGR_CONFIG_FILE
+	echo "restore_command=/usr/bin/barman-wal-restore --parallel=4 --bzip2 $BARMAN_SERVER $CLUSTER_NAME %f %p" >> $REPMGR_CONFIG_FILE
+fi
 
 echo ">>> Setting up upstream node..."
 if [[ "$CURRENT_REPLICATION_PRIMARY_HOST" != "" ]]; then

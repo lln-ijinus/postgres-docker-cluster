@@ -3,7 +3,7 @@ ARG POSTGRES_VERSION=9.5
 
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list && apt-get update --fix-missing && \
 		apt-get install -y wget ca-certificates && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && apt-get update && \
-    apt-get install -y postgresql-server-dev-$POSTGRES_VERSION postgresql-$POSTGRES_VERSION-repmgr 
+    apt-get install -y postgresql-server-dev-$POSTGRES_VERSION postgresql-$POSTGRES_VERSION-repmgr barman-cli rsync
 		
 # Inherited variables
 # ENV POSTGRES_PASSWORD monkey_pass
@@ -62,7 +62,17 @@ ENV CLUSTER_NAME=pg_cluster \
 	## - Do it if it is a master db, can connect to the database but not to the replication db
 	## - Also update postgresql config
 	## - For update from a simple postgres docker image
-	UPDATE_EXISTING_DB=0
+	UPDATE_EXISTING_DB=0 \
+	#### Barman configuration ####
+	## barman server name
+	BARMAN_SERVER="" \
+	BARMAN_SSH_PORT=22 \
+	BARMAN_USE_REPLICATION_SLOTS=1 \
+	BARMAN_USE_RSYNC=0 \
+	BARMAN_INCOMING_WALS_DIRECTORY="" \
+	BARMAN_SSH_PUB_PATH=/etc/pg_cluster.pub \
+	BARMAN_SSH_PRIV_PATH=/etc/pg_cluster.key 
+	
 
 
 

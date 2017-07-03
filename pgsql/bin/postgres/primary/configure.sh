@@ -20,3 +20,26 @@ do
     echo ">>>>>> Adding config '$VAR'='$VAL' "
     echo "$VAR = $VAL" >> $CONFIG_FILE
 done
+
+if [[ "$BARMAN_SERVER" != "" ]]; then
+	if [[ "$BARMAN_USE_REPLICATION_SLOTS" == "1" ]]; then
+		echo "max_replication_slots = 2" >> /etc/postgresql/primary.default.conf
+	elif [[ "$BARMAN_USE_RSYNC" == "1" ]]; then
+		if [[ "$BARMAN_INCOMING_WALS_DIRECTORY" == "" ]]; then 
+			BARMAN_INCOMING_WALS_DIRECTORY=/var/lib/barman/$CLUSTER_NAME/incoming
+		fi
+		echo "archive_mode=on" >> /etc/postgresql/primary.default.conf
+		echo "archive_command='rsync -e \"ssh -p $BARMAN_SSH_PORT -o StrictHostKeyChecking=no\" -a %p barman@backup:$BARMAN_INCOMING_WALS_DIRECTORY/%f'" >> /etc/postgresql/primary.default.conf
+	fi
+fi
+
+echo "port=$REPLICATION_PRIMARY_PORT" > /etc/postgresql/local.conf
+IFS=',' read -ra CONFIG_PAIRS <<< "$LOCAL_CONFIGS"
+for CONFIG_PAIR in "${CONFIG_PAIRS[@]}"
+do
+    IFS=':' read -ra CONFIG <<< "$CONFIG_PAIR"
+    VAR="${CONFIG[0]}"
+    VAL="${CONFIG[1]}"
+    echo ">>>>>> Adding local config '$VAR'='$VAL' "
+    echo "$VAR = $VAL" >> /etc/postgresql/local.conf
+done

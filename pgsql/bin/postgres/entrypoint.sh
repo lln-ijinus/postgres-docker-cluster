@@ -9,18 +9,26 @@ if [ -f "$MASTER_ROLE_LOCK_FILE_NAME" ]; then
 
     if [[ "$CURRENT_MASTER" == "" ]]; then
         echo ">>> Can not find new master. Will keep starting postgres normally..."
+				[[ -e /etc/postgresql/primary.default.conf ]] && cp /etc/postgresql/primary.default.conf /etc/postgresql/primary.conf
+				[[ -e /etc/postgresql/standby.conf ]] && rm /etc/postgresql/standby.conf 
         export CURRENT_REPLICATION_PRIMARY_HOST=""
     else
         echo ">>> Current master is $CURRENT_MASTER. Will clone it and act as a standby node..."
         rm -f "$MASTER_ROLE_LOCK_FILE_NAME"
+				[[ -e /etc/postgresql/primary.conf ]] && rm /etc/postgresql/primary.conf
+				[[ -e /etc/postgresql/standby.default.conf ]] && cp /etc/postgresql/primary.standby.conf /etc/postgresql/standby.conf
         export FORCE_CLEAN=1
         export CURRENT_REPLICATION_PRIMARY_HOST="$CURRENT_MASTER"
     fi
 else
     if [[ "$CURRENT_MASTER" == "" ]]; then
         export CURRENT_REPLICATION_PRIMARY_HOST="$REPLICATION_PRIMARY_HOST"
+				[[ -e /etc/postgresql/primary.default.conf ]] && cp /etc/postgresql/primary.default.conf /etc/postgresql/primary.conf
+				[[ -e /etc/postgresql/standby.conf ]] && rm /etc/postgresql/standby.conf 
     else
         export CURRENT_REPLICATION_PRIMARY_HOST="$CURRENT_MASTER"
+				[[ -e /etc/postgresql/primary.conf ]] && rm /etc/postgresql/primary.conf
+				[[ -e /etc/postgresql/standby.default.conf ]] && cp /etc/postgresql/primary.standby.conf /etc/postgresql/standby.conf
     fi
 fi
 
@@ -38,7 +46,9 @@ if [ `ls $PGDATA/ | wc -l` != "0" ]; then
     fi
 fi
 chown -R postgres $PGDATA && chmod -R 0700 $PGDATA
+chown -R postgres /etc/postgresql
 
+/usr/local/bin/cluster/barman/configure.sh
 /usr/local/bin/cluster/repmgr/configure.sh
 
 echo ">>> Sending in background postgres start..."

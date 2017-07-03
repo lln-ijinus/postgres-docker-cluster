@@ -9,6 +9,8 @@ if [[ "$CURRENT_REPLICATION_PRIMARY_HOST" == "" ]] && [[ "$UPDATE_EXISTING_DB" =
 	if [[ "$DB_EXISTS" != "1" ]]; then
 		echo ">>> No replication database : creating it"
 		gosu postgres /usr/local/bin/cluster/postgres/primary/entrypoint.sh
+		[[ -e /etc/postgresql/primary.default.conf ]] && cp /etc/postgresql/primary.default.conf /etc/postgresql/primary.conf
+		[[ -e /etc/postgresql/standby.conf ]] && rm /etc/postgresql/standby.conf 
 		gosu postgres pg_ctl -D "$PGDATA" -m fast -w stop
 		gosu postgres /docker-entrypoint.sh postgres &
 	fi
