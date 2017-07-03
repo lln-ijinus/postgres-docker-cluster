@@ -16,9 +16,13 @@ echo ">>> Adding users for md5 auth"
 IFS=',' read -ra USER_PASSES <<< "$DB_USERS"
 for USER_PASS in ${USER_PASSES[@]}
 do
-    IFS=':' read -ra USER <<< "$USER_PASS"
-    echo ">>>>>> Adding user ${USER[0]}"
-    pg_md5 --md5auth --username="${USER[0]}" "${USER[1]}"
+		
+		if [[ "$USER_PASS" == *":"* ]];then 
+			USER=${NODE##*:}
+			PASS=${NODE%:*}
+		fi
+    echo ">>>>>> Adding user ${USER}"
+    pg_md5 --md5auth --username="${USER}" "${PASS}"
 done
 
 echo ">>> Adding check user '$CHECK_USER' for md5 auth"
