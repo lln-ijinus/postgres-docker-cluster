@@ -23,13 +23,13 @@ done
 
 if [[ "$BARMAN_SERVER" != "" ]]; then
 	if [[ "$BARMAN_USE_REPLICATION_SLOTS" == "1" ]]; then
-		echo "max_replication_slots = 2" >> /etc/postgresql/primary.default.conf
+		echo "max_replication_slots = 2" >> $CONFIG_FILE
 	elif [[ "$BARMAN_USE_RSYNC" == "1" ]]; then
 		if [[ "$BARMAN_INCOMING_WALS_DIRECTORY" == "" ]]; then 
 			BARMAN_INCOMING_WALS_DIRECTORY=/var/lib/barman/$CLUSTER_NAME/incoming
 		fi
-		echo "archive_mode=on" >> /etc/postgresql/primary.default.conf
-		echo "archive_command='rsync -e \"ssh -p $BARMAN_SSH_PORT -o StrictHostKeyChecking=no\" -a %p barman@backup:$BARMAN_INCOMING_WALS_DIRECTORY/%f'" >> /etc/postgresql/primary.default.conf
+		echo "archive_mode=on" >> $CONFIG_FILE
+		echo "archive_command='rsync -e \"ssh -p $BARMAN_SSH_PORT -o StrictHostKeyChecking=no\" -a %p barman@$BARMAN_SERVER:$BARMAN_INCOMING_WALS_DIRECTORY/%f'" >> $CONFIG_FILE
 	fi
 fi
 
