@@ -58,6 +58,7 @@ if [[ "$CURRENT_REPLICATION_PRIMARY_HOST" == "" ]]; then
 else
     /usr/local/bin/cluster/postgres/standby/entrypoint.sh &
 fi
-
+echo ">>> Start ssh"
+/etc/init.d/ssh start
 echo ">>> Start repmgr..."
 /usr/local/bin/cluster/repmgr/start.sh

@@ -3,7 +3,8 @@ ARG POSTGRES_VERSION=9.5
 
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list && apt-get update --fix-missing && \
 		apt-get install -y wget ca-certificates && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && apt-get update && \
-    apt-get install -y postgresql-server-dev-$POSTGRES_VERSION postgresql-$POSTGRES_VERSION-repmgr barman-cli rsync
+
+    apt-get install -y postgresql-server-dev-$POSTGRES_VERSION postgresql-$POSTGRES_VERSION-repmgr barman-cli rsync ssh
 		
 # Inherited variables
 # ENV POSTGRES_PASSWORD monkey_pass
